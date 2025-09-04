@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HostelBot</title>
+  <style>
+    :root {
+      --primary-color: #1a2b6d;
+      --secondary-color: #4a5bbd;
+      --accent-color: #0b5cff;
+      --light-bg: #f8fafc;
+      --dark-bg: #111827;
+      --text-light: #ffffff;
+      --text-dark: #021028;
+      --text-muted: #6b7280;
+      --border-color: #d7e2ea;
+      --message-bot: #e6eef8;
+      --message-user: var(--primary-color);
+      --shadow-sm: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-md: 0 6px 18px rgba(0,0,0,0.15);
+      --shadow-lg: 0 10px 30px rgba(0,0,0,0.2);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 50%;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-dark);
+      background-color: var(--light-bg);
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Chat Button */
+    .chat-floating-btn {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      background: var(--primary-color);
+      color: var(--text-light);
+      border-radius: var(--radius-full);
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      font-size: 24px;
+      z-index: 1000;
+      transition: var(--transition);
+    }
+
+    .chat-floating-btn:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-lg);
+      background: var(--secondary-color);
+    }
+
+    /* Chat Window */
+    .chat-window {
+      position: fixed;
+      right: 24px;
+      bottom: 96px;
+      width: 380px;
+      max-height: 70vh;
+      background: var(--text-light);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 999;
+      transition: var(--transition);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Chat Header */
+    .chat-header {
+      background: var(--primary-color);
+      color: var(--text-light);
+      padding: 16px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chat-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-header .logo-icon {
+      font-size: 20px;
+    }
+
+    /* Chat Body */
+    .chat-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      background: var(--light-bg);
+      background-image: linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px);
+      background-size: 20px 20px;
+      scroll-behavior: smooth;
+    }
+
+    /* Messages */
+    .message {
+      margin: 12px 0;
+      display: flex;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      line-height: 1.5;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .bubble.user {
+      background: var(--message-user);
+      color: var(--text-light);
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble.bot {
+      background: var(--message-bot);
+      color: var(--text-dark);
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Chat Footer */
+    .chat-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 10px;
+      background: var(--text-light);
+    }
+
+    .chat-footer input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      font-size: 14px;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .chat-footer input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(11, 92, 255, 0.2);
+    }
+
+    .chat-footer button {
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-color);
+      color: var(--text-light);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .chat-footer button:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .chat-window {
+        right: 16px;
+        bottom: 80px;
+        width: calc(100% - 32px);
+        max-width: 380px;
+      }
+
+      .chat-floating-btn {
+        right: 16px;
+        bottom: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .chat-window {
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+      }
+
+      .chat-floating-btn.hidden {
+        display: none;
+      }
+
+      .chat-body {
+        padding: 12px;
+      }
+
+      .bubble {
+        max-width: 90%;
+        padding: 10px 14px;
+      }
+
+      .chat-footer {
+        padding: 10px;
+      }
+
+      .chat-footer input {
+        padding: 10px 12px;
+      }
+
+      .chat-footer button {
+        padding: 10px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-floating-btn" id="openBtn">💬</div>
+
+<div class="chat-window" id="chatWindow">
+  <div class="chat-header">
+    <div class="logo">
+      <span class="logo-icon">🏠</span>
+      <span>HostelBot</span>
+    </div>
+    <span class="tiny">AI Assistant</span>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-footer">
+    <input id="userInput" placeholder="Ask about menu, rooms, rules..." />
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
+
+<script>
+const openBtn = document.getElementById('openBtn');
+const chatWindow = document.getElementById('chatWindow');
+const chatBody = document.getElementById('chatBody');
+const sendBtn = document.getElementById('sendBtn');
+const userInput = document.getElementById('userInput');
+
+// Add welcome message when chat opens
+let welcomeShown = false;
+
+openBtn.onclick = () => {
+  const isVisible = chatWindow.style.display === 'flex';
+  chatWindow.style.display = isVisible ? 'none' : 'flex';
+  chatWindow.style.flexDirection = 'column';
+  
+  // Show welcome message only once when chat is opened
+  if (!welcomeShown && !isVisible) {
+    welcomeShown = true;
+    setTimeout(() => {
+      appendMessage('👋 Hi there! How can I help you with your hostel queries today?', 'bot');
+    }, 300);
+  }
+  
+  // On mobile, hide the button when chat is open
+  if (window.innerWidth <= 480) {
+    openBtn.classList.toggle('hidden', !isVisible);
+  }
+  
+  // Focus on input when chat opens
+  if (!isVisible) {
+    setTimeout(() => userInput.focus(), 300);
+  }
+};
+
+function appendMessage(text, who='bot') {
+  const msg = document.createElement('div');
+  msg.className = 'message ' + (who === 'user' ? 'user' : 'bot');
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble ' + (who === 'user' ? 'user' : 'bot');
+  bubble.innerHTML = text;
+  msg.appendChild(bubble);
+  chatBody.appendChild(msg);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+async function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text) return;
+
+  appendMessage(text, 'user');
+  userInput.value = '';
+  appendMessage('<div class="typing-indicator">typing...</div>', 'bot');
+
+  try {
+    const res = await fetch('/Hostel/student_chatbot/chat_api.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({message: text})
+    });
+    const data = await res.json();
+
+    // remove typing bubble
+    const last = chatBody.lastChild;
+    if (last && last.querySelector('.bubble') && last.querySelector('.bubble').textContent === 'typing...') {
+      chatBody.removeChild(last);
+    }
+
+    if (data && data.reply) {
+      appendMessage(data.reply, 'bot');
+    } else {
+      appendMessage('Sorry, no reply from server.', 'bot');
+    }
+  } catch(err) {
+    console.error(err);
+    const last = chatBody.lastChild;
+    if (last && last.querySelector('.bubble') && last.querySelector('.bubble').textContent === 'typing...') {
+      chatBody.removeChild(last);
+    }
+    appendMessage('Network/server error. Please try again later.', 'bot');
+  }
+}
+
+sendBtn.onclick = sendMessage;
+userInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+// Handle responsive behavior
+window.addEventListener('resize', () => {
+  if (window.innerWidth <= 480) {
+    // On mobile, hide button when chat is open
+    if (chatWindow.style.display === 'flex') {
+      openBtn.classList.add('hidden');
+    }
+  } else {
+    // On desktop, always show button
+    openBtn.classList.remove('hidden');
+  }
+});
+</script>
+
+</body>
+</html>
