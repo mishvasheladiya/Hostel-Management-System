@@ -27,16 +27,27 @@ It is designed to simplify and automate hostel operations like student registrat
 
 ## 📂 Project Structure
 hostel/
+
 │── assets/              # Images, CSS, JS files
+
 │── components/          # About, Contact, Information, Login, Logout, Menu, Register, Room
+
 │── dashboard/           # Admin dashboard & Student dashboard
+
 │── student_chatbot/     # Chatbot integration
+
 │── templates/           # Carousel, Header, Footer
+
 │── index.php 
+
 │── functions.php 
+
 │── search.php
+
 │── mark-notifications-read.php
+
 │── .gitignore
+
 │── README.md
 
 ---
@@ -92,3 +103,4 @@ Navigate to the components/Login/ folder in CMD and run: `composer install`
 
 5) Run the Project
    Open your browser and visit: 👉 http://localhost/Hostel
+
