@@ -4,7 +4,7 @@ require __DIR__ . "/vendor/autoload.php";
 $client = new Google\Client();
 
 $client->setClientId("#");
-$client->setClientSecret("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");
+$client->setClientSecret("*");
 $client->setRedirectUri("http://localhost/Hostel/dashboard/Student-dashboard/student-dashboard.php");
 
 $client->addScope("email");
